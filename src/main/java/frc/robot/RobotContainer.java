@@ -16,9 +16,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.HangingSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class RobotContainer {
   private double MaxSpeed = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
@@ -29,6 +31,8 @@ public class RobotContainer {
   private final Joystick climberJoystick = new Joystick(1);
   private final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
   private final HangingSubsystem hanger = new HangingSubsystem();
+  private final ShooterSubsystem shooter = new ShooterSubsystem();
+
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a % deadband for joystick input
@@ -50,12 +54,19 @@ public class RobotContainer {
     joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
     joystick.b().whileTrue(drivetrain
         .applyRequest(() -> point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))));
-
-
-    hanger.setDefaultCommand( new RunCommand(() -> {
-      hanger.hang(climberJoystick.getY());
+    new JoystickButton(climberJoystick, 1).onTrue(new RunCommand(() -> {
+      shooter.setShooterSpeed(1);
     })
     );
+new JoystickButton(climberJoystick, 2).onTrue(new RunCommand(() -> {
+      shooter.setShooterSpeed(-.1);
+    })
+    );
+
+      hanger.setDefaultCommand(new RunCommand(() -> {
+        hanger.hang(climberJoystick.getY());
+      })
+      );
     // reset the field-centric heading on left bumper press
     joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
 
@@ -63,9 +74,6 @@ public class RobotContainer {
       drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
     }
     drivetrain.registerTelemetry(logger::telemeterize);
-
-    //Put the climber on a different joystick. Straight up and down controls.
-
   }
 
   public RobotContainer() {

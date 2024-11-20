@@ -40,8 +40,8 @@ public class RobotContainer {
   private void configureBindings() {
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
         drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward on the left joystick)
-            .withVelocityY(joystick.getLeftX() * MaxSpeed) // Drive right with positive X (right on left joystick)
-            .withRotationalRate(joystick.getRightX() * MaxAngularRate) // Drive clockwise with positive X (right on right joystick)
+            .withVelocityY(-joystick.getLeftX () * MaxSpeed) // Drive right with positive X (right on left joystick)
+            .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive clockwise with positive X (right on right joystick)
         ));
 
     joystick.a().whileTrue(drivetrain.applyRequest(() -> brake)); //brake when we press the A button
@@ -49,6 +49,7 @@ public class RobotContainer {
         .applyRequest(() -> point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))));
     // reset the field-centric heading on left bumper press
     joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
+    joystick.rightBumper().onTrue(drivetrain.runOnce(() -> drivetrain.tareEverything())); 
 
     if (Utils.isSimulation()) {
       drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));

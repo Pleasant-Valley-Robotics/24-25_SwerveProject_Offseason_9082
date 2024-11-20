@@ -35,6 +35,9 @@ public class Telemetry {
     private final NetworkTable table = inst.getTable("Pose");
     private final DoubleArrayPublisher fieldPub = table.getDoubleArrayTopic("robotPose").publish();
     private final StringPublisher fieldTypePub = table.getStringTopic(".type").publish();
+    private final DoublePublisher poseX = table.getDoubleTopic("robotPoseX").publish();
+    private final DoublePublisher poseY = table.getDoubleTopic("robotPoseY").publish();
+    private final DoublePublisher poseRotation = table.getDoubleTopic("robotPoseRotation").publish();
 
     /* Robot speeds for general checking */
     private final NetworkTable driveStats = inst.getTable("Drive");
@@ -83,6 +86,10 @@ public class Telemetry {
             pose.getY(),
             pose.getRotation().getDegrees()
         });
+
+        poseX.set(pose.getX());
+        poseY.set(pose.getY());
+        poseRotation.set(pose.getRotation().getDegrees());
 
         /* Telemeterize the robot's general speeds */
         double currentTime = Utils.getCurrentTimeSeconds();
